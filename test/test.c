@@ -5,11 +5,11 @@
  *      Author: janne
  */
 
-#include "../inc/thread_pool.h"
-#include "../inc/thread_pool_impl.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../inc/thread_starter.h"
+#include "../inc/thread_starter_impl.h"
 
 #define EXPECT(this, that) \
 if(this != that) \
@@ -37,15 +37,15 @@ void* threadFunc(void* arg)
 
 int main(void)
 {
-	struct ThreadPool* threadPool = get_thread_pool();
+	struct ThreadStarter* threadStarter = get_thread_starter(DETACHED);
 
 	unsigned int* testInt = (unsigned int*)malloc(sizeof(unsigned int));
 	*testInt = 1;
-	threadPool->execute_job(&threadFunc, testInt);
+	threadStarter->execute_job(&threadFunc, testInt);
 
 	sleep(1);
 
-	free(threadPool);
+	free(threadStarter);
 
 	return 0;
 }

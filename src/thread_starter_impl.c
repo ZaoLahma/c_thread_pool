@@ -5,10 +5,10 @@
  *      Author: janne
  */
 
-#include "../inc/thread_pool_impl.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#include "../inc/thread_starter_impl.h"
 
 void execute_job_impl(void* (*jobFunc)(void*), void* arg)
 {
@@ -18,11 +18,19 @@ void execute_job_impl(void* (*jobFunc)(void*), void* arg)
 	threadId = pthread_detach(thread);
 }
 
-struct ThreadPool* get_thread_pool()
+struct ThreadStarter* get_thread_starter(unsigned int type)
 {
-	struct ThreadPool* threadPool = (struct ThreadPool*)malloc(sizeof(struct ThreadPool));
+	struct ThreadStarter* threadPool = (struct ThreadStarter*)malloc(sizeof(struct ThreadStarter));
 
-	threadPool->execute_job = &execute_job_impl;
+	switch(type)
+	{
+	case DETACHED:
+		threadPool->execute_job = &execute_job_impl;
+		break;
+	default:
+		threadPool->execute_job = NULL;
+		break;
+	}
 
 	return threadPool;
 }

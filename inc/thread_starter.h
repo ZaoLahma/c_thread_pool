@@ -5,11 +5,11 @@
  *      Author: janne
  */
 
-#ifndef INC_THREAD_POOL_H_
-#define INC_THREAD_POOL_H_
+#ifndef INC_THREAD_STARTER_H_
+#define INC_THREAD_STARTER_H_
 
-struct ThreadPool {
+struct ThreadStarter {
 	void (*execute_job)(void* (*jobFunc)(void*), void*);
 };
 
-#endif /* INC_THREAD_POOL_H_ */
+#endif /* INC_THREAD_STARTER_H_ */
