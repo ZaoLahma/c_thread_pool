@@ -19,17 +19,17 @@ void execute_job_detached_thread_impl(void* (*thread_func)(void*), void* arg)
 
 struct ThreadStarter* get_thread_starter(unsigned int type)
 {
-	struct ThreadStarter* threadPool = (struct ThreadStarter*)malloc(sizeof(struct ThreadStarter));
+	struct ThreadStarter* threadStarter = (struct ThreadStarter*)malloc(sizeof(struct ThreadStarter));
 
 	switch(type)
 	{
 	case DETACHED:
-		threadPool->execute_function = &execute_job_detached_thread_impl;
+		threadStarter->execute_function = &execute_job_detached_thread_impl;
 		break;
 	default:
-		threadPool->execute_function = NULL;
+		threadStarter->execute_function = NULL;
 		break;
 	}
 
-	return threadPool;
+	return threadStarter;
 }

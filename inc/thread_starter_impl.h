@@ -15,6 +15,5 @@
 
 //Function implementation
 struct ThreadStarter* get_thread_starter(unsigned int type);
-void execute_job_detached_thread_impl(void* (*thread_func)(void*), void* arg);
 
 #endif /* INC_THREAD_STARTER_IMPL_H_ */
