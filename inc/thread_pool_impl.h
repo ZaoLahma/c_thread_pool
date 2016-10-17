@@ -8,10 +8,12 @@
 #ifndef INC_THREAD_POOL_IMPL_H_
 #define INC_THREAD_POOL_IMPL_H_
 
-#include <pthread.h>
 #include "./thread_pool.h"
 
+struct ThreadList;
+
+//Function implementation
 struct ThreadPool* get_thread_pool();
-void execute_job_impl();
+void execute_job_impl(void* (*jobFunc)(void*), void* arg);
 
 #endif /* INC_THREAD_POOL_IMPL_H_ */

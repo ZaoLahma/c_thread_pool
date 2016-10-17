@@ -8,10 +8,14 @@
 #include "../inc/thread_pool_impl.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
 
-void execute_job_impl()
+void execute_job_impl(void* (*jobFunc)(void*), void* arg)
 {
-	printf("Implement me\n");
+	//Obviously this is not a thread pool, but it's a start...
+	pthread_t thread;
+	int threadId = pthread_create(&thread, NULL, jobFunc, arg);
+	threadId = pthread_detach(thread);
 }
 
 struct ThreadPool* get_thread_pool()

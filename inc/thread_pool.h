@@ -9,7 +9,7 @@
 #define INC_THREAD_POOL_H_
 
 struct ThreadPool {
-	void (*execute_job)();
+	void (*execute_job)(void* (*jobFunc)(void*), void*);
 };
 
 #endif /* INC_THREAD_POOL_H_ */
