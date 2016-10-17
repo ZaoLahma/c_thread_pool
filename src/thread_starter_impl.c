@@ -10,12 +10,11 @@
 #include <pthread.h>
 #include "../inc/thread_starter_impl.h"
 
-void execute_job_impl(void* (*jobFunc)(void*), void* arg)
+void execute_job_detached_thread_impl(void* (*thread_func)(void*), void* arg)
 {
-	//Obviously this is not a thread pool, but it's a start...
 	pthread_t thread;
-	int threadId = pthread_create(&thread, NULL, jobFunc, arg);
-	threadId = pthread_detach(thread);
+	int threadStatus = pthread_create(&thread, NULL, thread_func, arg);
+	threadStatus = pthread_detach(thread);
 }
 
 struct ThreadStarter* get_thread_starter(unsigned int type)
@@ -25,10 +24,10 @@ struct ThreadStarter* get_thread_starter(unsigned int type)
 	switch(type)
 	{
 	case DETACHED:
-		threadPool->execute_job = &execute_job_impl;
+		threadPool->execute_function = &execute_job_detached_thread_impl;
 		break;
 	default:
-		threadPool->execute_job = NULL;
+		threadPool->execute_function = NULL;
 		break;
 	}
 

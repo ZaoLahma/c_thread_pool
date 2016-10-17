@@ -9,7 +9,7 @@
 #define INC_THREAD_STARTER_H_
 
 struct ThreadStarter {
-	void (*execute_job)(void* (*jobFunc)(void*), void*);
+	void (*execute_function)(void* (*thread_func)(void*), void*);
 };
 
 #endif /* INC_THREAD_STARTER_H_ */

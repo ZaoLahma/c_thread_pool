@@ -23,7 +23,7 @@ else\
 	printf(#this " == " #that " validated OK\n");\
 }
 
-void* threadFunc(void* arg)
+void* thread_func(void* arg)
 {
 	printf("This is executed in a thread\n");
 
@@ -41,7 +41,7 @@ int main(void)
 
 	unsigned int* testInt = (unsigned int*)malloc(sizeof(unsigned int));
 	*testInt = 1;
-	threadStarter->execute_job(&threadFunc, testInt);
+	threadStarter->execute_function(&thread_func, testInt);
 
 	sleep(1);
 
