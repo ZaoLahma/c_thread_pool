@@ -30,7 +30,7 @@ void* thread_func(void* arg)
 	unsigned int* testInt = (unsigned int*)arg;
 	EXPECT(1, *testInt);
 
-	free(testInt);
+	//free(testInt);
 
 	return NULL;
 }
@@ -47,5 +47,15 @@ int main(void)
 
 	free(threadStarter);
 
+	threadStarter = get_thread_starter(POOL);
+
+	threadStarter->execute_function(&thread_func, testInt);
+	threadStarter->execute_function(&thread_func, testInt);
+	threadStarter->execute_function(&thread_func, testInt);
+	threadStarter->execute_function(&thread_func, testInt);
+	threadStarter->execute_function(&thread_func, testInt);
+
+
+	free(testInt);
 	return 0;
 }
