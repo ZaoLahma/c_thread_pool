@@ -55,6 +55,7 @@ int main(void)
 	threadStarter->execute_function(&thread_func, testInt);
 	threadStarter->execute_function(&thread_func, testInt);
 
+	sleep(1);
 
 	free(testInt);
 	return 0;
