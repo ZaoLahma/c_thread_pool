@@ -29,9 +29,10 @@ struct QueueItem
 
 static struct QueueItem* queue = NULL;
 
-
+pthread_mutex_t mutex;
 void queue_execution(struct QueueItem* item)
 {
+	pthread_mutex_lock(&mutex);
 	printf("queue_execution called\n");
 
 	struct QueueItem* lastItem = queue;
@@ -40,6 +41,7 @@ void queue_execution(struct QueueItem* item)
 	{
 		printf("First queue item\n");
 		queue = item;
+		pthread_mutex_unlock(&mutex);
 		return;
 	}
 
@@ -50,13 +52,16 @@ void queue_execution(struct QueueItem* item)
 	}
 
 	lastItem->next = item;
+	pthread_mutex_unlock(&mutex);
 }
 
 struct QueueItem* pop_queue()
 {
+	pthread_mutex_lock(&mutex);
 	struct QueueItem* retVal = queue;
 	queue = queue->next;
 
+	pthread_mutex_unlock(&mutex);
 	return retVal;
 }
 
@@ -65,7 +70,6 @@ void* pool_thread_func(void* arg)
 	struct QueueItem* queuePtr = queue;
 	while(1)
 	{
-
 	}
 
 	return NULL;
@@ -86,6 +90,7 @@ void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
 	if(NULL != queueItem)
 	{
 		queueItem->thread_func(queueItem->args);
+		free(queueItem);
 	}
 }
 
@@ -100,6 +105,7 @@ struct ThreadStarter* get_thread_starter(unsigned int type)
 		threadStarter->execute_function = &execute_job_detached_thread_impl;
 		break;
 	case POOL:
+		pthread_mutex_init(&mutex, NULL);
 		threadStarter->execute_function = &execute_job_thread_pool_impl;
 		break;
 	default:
