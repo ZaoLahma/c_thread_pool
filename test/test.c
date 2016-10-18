@@ -37,6 +37,8 @@ void* thread_func(void* arg)
 
 int main(void)
 {
+	printf("----- DETACHED TEST----- \n");
+
 	struct ThreadStarter* threadStarter = get_thread_starter(DETACHED);
 
 	unsigned int* testInt = (unsigned int*)malloc(sizeof(unsigned int));
@@ -46,6 +48,8 @@ int main(void)
 	sleep(1);
 
 	free(threadStarter);
+
+	printf("----- POOL TEST----- \n");
 
 	threadStarter = get_thread_starter(POOL);
 
