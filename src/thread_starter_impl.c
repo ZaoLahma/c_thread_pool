@@ -79,7 +79,8 @@ struct PoolThreadFunc
 	int busy;
 	struct PoolThreadFunc* next;
 };
-struct PoolThreadFunc* threads;
+static struct PoolThreadFunc* threads;
+static int num_threads = 0;
 
 void* pool_thread_func(void* arg)
 {
@@ -129,7 +130,7 @@ void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
 			pthread_mutex_lock(&thread->mutex);
 			pthread_cond_signal(&thread->cond);
 			pthread_mutex_unlock(&thread->mutex);
-			break;
+			return;
 		}
 		//printf("execute_job_thread_pool_impl leaving mutex\n");
 		thread = thread->next;
@@ -137,6 +138,30 @@ void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
 
 	}
 	//printf("execute_job_thread_pool_impl exit\n");
+
+	num_threads++;
+	printf("num_threads: %d\n", num_threads);
+
+	thread = (struct PoolThreadFunc*)malloc(sizeof(struct PoolThreadFunc));
+	pthread_mutex_init(&thread->mutex, NULL);
+	pthread_cond_init(&thread->cond, NULL);
+	pthread_create(&thread->thread, NULL, &pool_thread_func, thread);
+	if(NULL == threads)
+	{
+		threads = thread;
+	}
+	else
+	{
+		struct PoolThreadFunc* lastElem = threads;
+		int numThreads = 1;
+
+		while(lastElem->next != NULL)
+		{
+			lastElem = lastElem->next;
+			numThreads++;
+		}
+		lastElem->next = thread;
+	}
 }
 
 //The API
@@ -151,20 +176,6 @@ struct ThreadStarter* get_thread_starter(unsigned int type)
 		break;
 	case POOL:
 		pthread_mutex_init(&mutex, NULL);
-
-		struct PoolThreadFunc* thread = (struct PoolThreadFunc*)malloc(sizeof(struct PoolThreadFunc));
-		pthread_mutex_init(&thread->mutex, NULL);
-		pthread_cond_init(&thread->cond, NULL);
-		pthread_create(&thread->thread, NULL, &pool_thread_func, thread);
-		threads = thread;
-
-		thread = (struct PoolThreadFunc*)malloc(sizeof(struct PoolThreadFunc));
-		pthread_mutex_init(&thread->mutex, NULL);
-		pthread_cond_init(&thread->cond, NULL);
-		pthread_create(&thread->thread, NULL, &pool_thread_func, thread);
-		threads->next = thread;
-		thread->next = NULL;
-
 		threadStarter->execute_function = &execute_job_thread_pool_impl;
 		break;
 	default:

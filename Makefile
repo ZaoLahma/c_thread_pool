@@ -15,6 +15,8 @@ $(EXE_NAME): $(OBJECTS) $(TEST_OBJECTS)
 %.o: %.cpp
 	$(CCOMMAND) $(INC_DIRS) -c $(CFLAGS) $< -o $@
 
+lib: $(OBJECTS)
+	ar rvs thread_starter.a $(OBJECTS)
+
 clean:
 	rm -f $(EXE_NAME) $(OBJECTS) $(TEST_OBJECTS)
-	
