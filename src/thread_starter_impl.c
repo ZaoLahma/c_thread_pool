@@ -10,6 +10,12 @@
 #include <pthread.h>
 #include "../inc/thread_starter_impl.h"
 
+//Local variables
+static struct QueueItem* queue = NULL;
+static pthread_mutex_t mutex;
+static struct PoolThreadFunc* threads;
+static int num_threads = 0;
+
 //Detached thread impl
 void execute_job_detached_thread_impl(void* (*thread_func)(void*), void* arg)
 {
@@ -17,7 +23,6 @@ void execute_job_detached_thread_impl(void* (*thread_func)(void*), void* arg)
 	int threadStatus = pthread_create(&thread, NULL, thread_func, arg);
 	threadStatus = pthread_detach(thread);
 }
-
 
 //Thread pool impl
 struct QueueItem
@@ -27,9 +32,6 @@ struct QueueItem
 	struct QueueItem* next;
 };
 
-static struct QueueItem* queue = NULL;
-
-pthread_mutex_t mutex;
 void queue_execution(struct QueueItem* item)
 {
 	pthread_mutex_lock(&mutex);
@@ -70,7 +72,6 @@ struct QueueItem* pop_queue()
 	return retVal;
 }
 
-
 struct PoolThreadFunc
 {
 	pthread_t thread;
@@ -79,8 +80,6 @@ struct PoolThreadFunc
 	int busy;
 	struct PoolThreadFunc* next;
 };
-static struct PoolThreadFunc* threads;
-static int num_threads = 0;
 
 void* pool_thread_func(void* arg)
 {
