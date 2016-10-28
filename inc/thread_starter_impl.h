@@ -14,6 +14,7 @@
 #define POOL     1
 
 //Function implementation
-struct ThreadStarter* get_thread_starter(unsigned int type);
+void init_thread_starter(struct ThreadStarter* threadStarter,
+		                 unsigned int type);
 
 #endif /* INC_THREAD_STARTER_IMPL_H_ */

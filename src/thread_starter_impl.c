@@ -164,10 +164,9 @@ void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
 }
 
 //The API
-struct ThreadStarter* get_thread_starter(unsigned int type)
+void init_thread_starter(struct ThreadStarter* threadStarter,
+		                 unsigned int type)
 {
-	struct ThreadStarter* threadStarter = (struct ThreadStarter*)malloc(sizeof(struct ThreadStarter));
-
 	switch(type)
 	{
 	case DETACHED:
@@ -181,6 +180,4 @@ struct ThreadStarter* get_thread_starter(unsigned int type)
 		threadStarter->execute_function = NULL;
 		break;
 	}
-
-	return threadStarter;
 }

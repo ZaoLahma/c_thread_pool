@@ -37,27 +37,26 @@ int main(void)
 {
 	printf("----- DETACHED TEST----- \n");
 
-	struct ThreadStarter* threadStarter = get_thread_starter(DETACHED);
+	struct ThreadStarter threadStarter;
+	init_thread_starter(&threadStarter, DETACHED);
 
 	unsigned int* testInt = (unsigned int*)malloc(sizeof(unsigned int));
 	*testInt = 1;
-	threadStarter->execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func, testInt);
 
 	sleep(1);
 
-	free(threadStarter);
-
 	printf("----- POOL TEST----- \n");
 
-	threadStarter = get_thread_starter(POOL);
+	init_thread_starter(&threadStarter, POOL);
 
-	threadStarter->execute_function(&thread_func, testInt);
-	threadStarter->execute_function(&thread_func, testInt);
-	threadStarter->execute_function(&thread_func, testInt);
-	threadStarter->execute_function(&thread_func, testInt);
-	threadStarter->execute_function(&thread_func, testInt);
-	threadStarter->execute_function(&thread_func, testInt);
-	threadStarter->execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func, testInt);
 
 	sleep(1);
 
