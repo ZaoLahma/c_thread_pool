@@ -23,12 +23,20 @@ else\
 	printf(#this " == " #that " validated OK\n");\
 }
 
-void* thread_func(void* arg)
+void* thread_func_1(void* arg)
 {
 	printf("This is executed in a thread\n");
 
 	unsigned int* testInt = (unsigned int*)arg;
 	EXPECT(1, *testInt);
+
+	return NULL;
+}
+
+void* thread_func_2(void* arg)
+{
+	unsigned int* testInt = (unsigned int*)arg;
+	EXPECT(2, *testInt);
 
 	return NULL;
 }
@@ -42,7 +50,11 @@ int main(void)
 
 	unsigned int* testInt = (unsigned int*)malloc(sizeof(unsigned int));
 	*testInt = 1;
-	threadStarter.execute_function(&thread_func, testInt);
+
+	unsigned int* testInt_2 = (unsigned int*)malloc(sizeof(unsigned int));
+	*testInt_2 = 2;
+	threadStarter.execute_function(&thread_func_1, testInt);
+	threadStarter.execute_function(&thread_func_2, testInt_2);
 
 	sleep(1);
 
@@ -50,13 +62,13 @@ int main(void)
 
 	init_thread_starter(&threadStarter, POOL);
 
-	threadStarter.execute_function(&thread_func, testInt);
-	threadStarter.execute_function(&thread_func, testInt);
-	threadStarter.execute_function(&thread_func, testInt);
-	threadStarter.execute_function(&thread_func, testInt);
-	threadStarter.execute_function(&thread_func, testInt);
-	threadStarter.execute_function(&thread_func, testInt);
-	threadStarter.execute_function(&thread_func, testInt);
+	threadStarter.execute_function(&thread_func_1, testInt);
+	threadStarter.execute_function(&thread_func_2, testInt_2);
+	threadStarter.execute_function(&thread_func_2, testInt_2);
+	threadStarter.execute_function(&thread_func_1, testInt);
+	threadStarter.execute_function(&thread_func_2, testInt_2);
+	threadStarter.execute_function(&thread_func_1, testInt);
+	threadStarter.execute_function(&thread_func_1, testInt);
 
 	sleep(1);
 
