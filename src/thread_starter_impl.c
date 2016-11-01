@@ -11,16 +11,18 @@
 #include "../inc/thread_starter_impl.h"
 
 //Local variables
-static struct QueueItem* queue = NULL;
+static struct QueueItem* queue = 0;
 static pthread_mutex_t mutex;
 static struct PoolThreadFunc* threads;
 static int num_threads = 0;
+unsigned int const POOL = 0;
+unsigned int const DETACHED = 1;
 
 //Detached thread impl
 void execute_job_detached_thread_impl(void* (*thread_func)(void*), void* arg)
 {
 	pthread_t thread;
-	int threadStatus = pthread_create(&thread, NULL, thread_func, arg);
+	int threadStatus = pthread_create(&thread, 0, thread_func, arg);
 	threadStatus = pthread_detach(thread);
 }
 
@@ -39,7 +41,7 @@ void queue_execution(struct QueueItem* item)
 
 	struct QueueItem* lastItem = queue;
 
-	if(lastItem == NULL)
+	if(lastItem == 0)
 	{
 		//printf("First queue item\n");
 		queue = item;
@@ -47,7 +49,7 @@ void queue_execution(struct QueueItem* item)
 		return;
 	}
 
-	while(lastItem->next != NULL)
+	while(lastItem->next != 0)
 	{
 		//printf("Stepping through queue\n");
 		lastItem = lastItem->next;
@@ -62,7 +64,7 @@ struct QueueItem* pop_queue()
 	//printf("pop_queue called\n");
 	pthread_mutex_lock(&mutex);
 	struct QueueItem* retVal = queue;
-	if(queue != NULL)
+	if(queue != 0)
 	{
 		queue = queue->next;
 	}
@@ -84,13 +86,13 @@ struct PoolThreadFunc
 void* pool_thread_func(void* arg)
 {
 	//printf("pool_thread_func called\n");
-	struct QueueItem* queuePtr = NULL;
+	struct QueueItem* queuePtr = 0;
 	struct PoolThreadFunc* poolThreadFunc = (struct PoolThreadFunc*)arg;
 	poolThreadFunc->busy = 1;
 	while(1)
 	{
 		queuePtr = pop_queue();
-		while(queuePtr != NULL)
+		while(queuePtr != 0)
 		{
 			//printf("Executing queue: %p\n", queuePtr);
 			queuePtr->thread_func(queuePtr->args);
@@ -107,7 +109,7 @@ void* pool_thread_func(void* arg)
 		poolThreadFunc->busy = 1;
 	}
 
-	return NULL;
+	return 0;
 }
 
 void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
@@ -116,12 +118,12 @@ void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
 
 	queueItem->thread_func = thread_func;
 	queueItem->args = arg;
-	queueItem->next = NULL;
+	queueItem->next = 0;
 
 	queue_execution(queueItem);
 
 	struct PoolThreadFunc* thread = threads;
-	while(thread != NULL)
+	while(thread != 0)
 	{
 		//printf("execute_job_thread_pool_impl taking mutex\n");
 		if(thread->busy == 0)
@@ -142,10 +144,10 @@ void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
 	printf("num_threads: %d\n", num_threads);
 
 	thread = (struct PoolThreadFunc*)malloc(sizeof(struct PoolThreadFunc));
-	pthread_mutex_init(&thread->mutex, NULL);
-	pthread_cond_init(&thread->cond, NULL);
-	pthread_create(&thread->thread, NULL, &pool_thread_func, thread);
-	if(NULL == threads)
+	pthread_mutex_init(&thread->mutex, 0);
+	pthread_cond_init(&thread->cond, 0);
+	pthread_create(&thread->thread, 0, &pool_thread_func, thread);
+	if(0 == threads)
 	{
 		threads = thread;
 	}
@@ -154,7 +156,7 @@ void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
 		struct PoolThreadFunc* lastElem = threads;
 		int numThreads = 1;
 
-		while(lastElem->next != NULL)
+		while(lastElem->next != 0)
 		{
 			lastElem = lastElem->next;
 			numThreads++;
@@ -173,11 +175,11 @@ void init_thread_starter(struct ThreadStarter* threadStarter,
 		threadStarter->execute_function = &execute_job_detached_thread_impl;
 		break;
 	case POOL:
-		pthread_mutex_init(&mutex, NULL);
+		pthread_mutex_init(&mutex, 0);
 		threadStarter->execute_function = &execute_job_thread_pool_impl;
 		break;
 	default:
-		threadStarter->execute_function = NULL;
+		threadStarter->execute_function = 0;
 		break;
 	}
 }
