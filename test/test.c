@@ -30,7 +30,7 @@ void* thread_func_1(void* arg)
 	unsigned int* testInt = (unsigned int*)arg;
 	EXPECT(1, *testInt);
 
-	return NULL;
+	return 0;
 }
 
 void* thread_func_2(void* arg)
@@ -38,7 +38,7 @@ void* thread_func_2(void* arg)
 	unsigned int* testInt = (unsigned int*)arg;
 	EXPECT(2, *testInt);
 
-	return NULL;
+	return 0;
 }
 
 int main(void)
