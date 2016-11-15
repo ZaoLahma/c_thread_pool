@@ -10,8 +10,11 @@
 
 #include "thread_starter.h"
 
-extern unsigned int const DETACHED;
-extern unsigned int const POOL;
+typedef enum THREAD_STARTER_TYPE
+{
+	POOL,
+	DETACHED
+} THREAD_STARTER_TYPE;
 
 //Function implementation
 void init_thread_starter(struct ThreadStarter* threadStarter,
