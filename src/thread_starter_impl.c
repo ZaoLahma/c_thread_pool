@@ -145,6 +145,8 @@ static void execute_job_thread_pool_impl(void* (*thread_func)(void*), void* arg)
 	printf("num_threads: %d\n", num_threads);
 
 	thread = (struct PoolThreadFunc*)malloc(sizeof(struct PoolThreadFunc));
+	thread->busy = 0;
+	thread->next = 0;
 	pthread_mutex_init(&thread->mutex, 0);
 	pthread_cond_init(&thread->cond, 0);
 	pthread_create(&thread->thread, 0, &pool_thread_func, thread);

@@ -1,5 +1,5 @@
 CCOMMAND = gcc
-CFLAGS = -Wall -c -Wextra
+CFLAGS = -Wall -c -Wextra -g
 LINKARGS = -lpthread
 SOURCES = $(wildcard src/*.c)
 TEST_SOURCES = $(wildcard test/*.c)

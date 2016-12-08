@@ -41,6 +41,23 @@ void* thread_func_2(void* arg)
 	return 0;
 }
 
+void* thread_func_3(void* arg)
+{
+    printf("Something something\n");
+    sleep(1);
+
+    return 0;
+}
+
+void* thread_func_4(void* arg)
+{
+    printf("Starting thread from second thread\n");
+    ThreadStarter* threadStarter = (ThreadStarter*)(arg);
+    threadStarter->execute_function(&thread_func_3, 0);
+
+    return 0;
+}
+
 int main(void)
 {
 	printf("----- DETACHED TEST----- \n");
@@ -62,16 +79,22 @@ int main(void)
 
 	init_thread_starter(&threadStarter, POOL);
 
-	threadStarter.execute_function(&thread_func_1, testInt);
-	threadStarter.execute_function(&thread_func_2, testInt_2);
-	threadStarter.execute_function(&thread_func_2, testInt_2);
-	threadStarter.execute_function(&thread_func_1, testInt);
-	threadStarter.execute_function(&thread_func_2, testInt_2);
-	threadStarter.execute_function(&thread_func_1, testInt);
-	threadStarter.execute_function(&thread_func_1, testInt);
+    int index = 0;
+    for(index = 0; index < 20; ++index)
+    {
+        threadStarter.execute_function(&thread_func_1, testInt);
+        threadStarter.execute_function(&thread_func_4, &threadStarter);
+        threadStarter.execute_function(&thread_func_2, testInt_2);
+        threadStarter.execute_function(&thread_func_2, testInt_2);
+        threadStarter.execute_function(&thread_func_1, testInt);
+        threadStarter.execute_function(&thread_func_2, testInt_2);
+        threadStarter.execute_function(&thread_func_1, testInt);
+        threadStarter.execute_function(&thread_func_1, testInt);
+	}
 
-	sleep(1);
+	sleep(2);
 
 	free(testInt);
+    free(testInt_2);
 	return 0;
 }
