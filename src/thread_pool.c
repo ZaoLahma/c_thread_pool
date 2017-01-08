@@ -16,8 +16,11 @@ struct ThreadContext;
 struct Thread
 {
     pthread_t thread;
+    pthread_mutex_t threadMutex;
+    pthread_cond_t execCondition;
     int active;
     int busy;
+    int threadId;
     struct ThreadContext* threadContext;
     struct Thread* next;
 };
@@ -27,6 +30,7 @@ struct ThreadContext
     pthread_mutex_t contextMutex;
     pthread_mutex_t jobQueueMutex;
     struct Thread* threads;
+    int numThreads;
     struct QueueItem* jobQueue;
 };
 
@@ -69,21 +73,26 @@ static struct QueueItem* pop_queue_item(struct ThreadContext* context)
 
 void* pool_thread_func(void* arg)
 {
-
-    printf("thread_pool_func called\n");
-
     struct Thread* thread = (struct Thread*)(arg);
+
+    printf("Thread %d started\n", thread->threadId);
 
     while(thread->active)
     {
-        thread->busy = 1;
         struct QueueItem* item = 0;
 
         while((item = pop_queue_item(thread->threadContext)) != 0)
         {
+            printf("Thread: %d handling job\n", thread->threadId);
             item->thread_func(item->args);
             free(item);
         }
+
+        pthread_mutex_lock(&thread->threadMutex);
+        thread->busy = 0;
+        pthread_cond_wait(&thread->execCondition, &thread->threadMutex);
+        thread->busy = 1;
+        pthread_mutex_unlock(&thread->threadMutex);
     }
 
     return 0;
@@ -96,6 +105,7 @@ struct ThreadContext* init_thread_pool()
     pthread_mutex_init(&threadCtxt->contextMutex, 0);
     pthread_mutex_init(&threadCtxt->jobQueueMutex, 0);
     threadCtxt->jobQueue = 0;
+    threadCtxt->numThreads = 0;
 
     return threadCtxt;
 }
@@ -118,11 +128,16 @@ static void create_thread(struct ThreadContext* context)
         lastThread->next = (struct Thread*)malloc(sizeof(struct Thread));
         lastThread = lastThread->next;
     }
+    pthread_mutex_init(&lastThread->threadMutex, 0);
+    pthread_cond_init(&lastThread->execCondition, 0);
     lastThread->active = 1;
-    lastThread->busy = 0;
+    lastThread->threadId = context->numThreads;
+    lastThread->busy = 1;
     lastThread->next = 0;
     lastThread->threadContext = context;
-    lastThread->thread = pthread_create(&context->threads->thread, 0, &pool_thread_func, context->threads);
+    lastThread->thread = pthread_create(&lastThread->thread, 0, &pool_thread_func, lastThread);
+    context->numThreads++;
+    printf("Created new thread. threadId: %d\n", lastThread->threadId);
 }
 
 void sched_job(struct ThreadContext* context, void* (*thread_func)(void*), void* args)
@@ -136,23 +151,26 @@ void sched_job(struct ThreadContext* context, void* (*thread_func)(void*), void*
 
     push_queue_item(context, item);
 
-    if(context->threads == 0)
-    {
-        create_thread(context);
-    }
-
     struct Thread* thread = context->threads;
 
     while(thread != 0)
     {
+        pthread_mutex_lock(&thread->threadMutex);
         if(thread->busy == 0)
         {
             printf("Notifying available thread\n");
+            pthread_cond_signal(&thread->execCondition);
+            pthread_mutex_unlock(&thread->threadMutex);
+            pthread_mutex_unlock(&context->contextMutex);
             return;
         }
 
+        pthread_mutex_unlock(&thread->threadMutex);
+
         thread = thread->next;
     }
+
+    create_thread(context);
 
     pthread_mutex_unlock(&context->contextMutex);
 }
