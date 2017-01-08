@@ -28,7 +28,7 @@ int main(void)
 
     usleep(500);
 
-    free(context);
+    destroy_thread_pool(context);
 
     return 0;
 }
