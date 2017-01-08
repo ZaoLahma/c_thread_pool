@@ -106,6 +106,7 @@ struct ThreadContext* init_thread_pool()
     pthread_mutex_init(&threadCtxt->jobQueueMutex, 0);
     threadCtxt->jobQueue = 0;
     threadCtxt->numThreads = 0;
+    threadCtxt->threads = 0;
 
     return threadCtxt;
 }
