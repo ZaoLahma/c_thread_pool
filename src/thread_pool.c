@@ -125,7 +125,7 @@ static void create_thread(struct ThreadContext* context)
     lastThread->busy = 1;
     lastThread->next = 0;
     lastThread->threadContext = context;
-    lastThread->thread = pthread_create(&lastThread->thread, 0, &pool_thread_func, lastThread);
+    pthread_create(&lastThread->thread, 0, &pool_thread_func, lastThread);
     context->numThreads++;
     printf("Created new thread. threadId: %d (%lu)\n", lastThread->threadId, lastThread->thread);
 }
@@ -189,14 +189,7 @@ void destroy_thread_pool(struct ThreadContext* context)
         thread->active = 0;
         pthread_cond_signal(&thread->execCondition);
         pthread_mutex_unlock(&thread->execMutex);
-
-        int* retVal = (int*)malloc(sizeof(int));
-
-        printf("Joining thread: %lu\n", thread->thread);
-
-        printf("pthread_join: %d\n", pthread_join(thread->thread, (void*)&retVal));
-
-        free(retVal);
+        printf("pthread_join %lu: %d\n", thread->thread, pthread_join(thread->thread, 0));
 
         struct Thread* toFree = thread;
         thread = thread->next;

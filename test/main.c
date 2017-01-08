@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <pthread.h>
 
 void* thread_function(void* arg)
 {
@@ -32,3 +33,4 @@ int main(void)
 
     return 0;
 }
+
