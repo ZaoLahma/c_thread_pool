@@ -13,7 +13,8 @@ void* thread_function(void* arg)
 
 int main(void)
 {
-    struct ThreadContext* context = init_thread_pool();
+    unsigned int maxThreads = 2;
+    struct ThreadContext* context = init_thread_pool(maxThreads);
 
     int test0 = 0;
     int test1 = 1;
@@ -22,12 +23,12 @@ int main(void)
     sched_job(context, &thread_function, &test1);
     sched_job(context, &thread_function, &test0);
     sched_job(context, &thread_function, &test1);
-    usleep(150);
+    usleep(200);
     sched_job(context, &thread_function, &test0);
     sched_job(context, &thread_function, &test1);
     sched_job(context, &thread_function, &test0);
 
-    usleep(500);
+    usleep(1000);
 
     destroy_thread_pool(context);
 
