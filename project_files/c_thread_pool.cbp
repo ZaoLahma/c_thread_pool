@@ -31,7 +31,11 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.c">
+		<Unit filename="../inc/thread_pool.h" />
+		<Unit filename="../src/thread_pool.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../test/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
